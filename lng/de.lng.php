@@ -2017,6 +2017,10 @@ Vielen Dank, Ihr Administrator',
 			'description' => 'Um die froxlor API nutzen zu können, muss diese Option aktiviert sein. Für detaillierte Informationen siehe <a href="https://docs.froxlor.org/latest/api-guide/" target="_new">https://docs.froxlor.org/</a>',
 		],
 		'api_customer_default' => '"Erlaube API Nutzung" Vorbelegung für neue Kunden',
+		'use_varnish' => [
+			'title' => 'Aktiviere Varnish Cache',
+			'description' => 'Bei Aktivierung wird das Cachen aller Anwendungen aktiviert.<br><em class="text-danger">CACHING KANN NICHT PRO DOMAIN EINGESTELLT WERDEN!</em>',
+		],
 		'dhparams_file' => [
 			'title' => 'DHParams Datei (Diffie–Hellman key exchange)',
 			'description' => 'Wird eine dhparams.pem Datei hier angegeben, wir sie in die Webserver Konfiguration mit eingefügt.<br>Beispiel: /etc/ssl/webserver/dhparams.pem<br><br>Existiert die Datei nicht, wird sie wie folgt erstellt: <code>openssl dhparam -out /etc/ssl/webserver/dhparams.pem 4096</code>. Es wird empfohlen die Datei zu erstellen, bevor sie hier angegeben wird, da die Erstellung längere Zeit in Anspruch nimmt und den Cronjob blockiert.',
