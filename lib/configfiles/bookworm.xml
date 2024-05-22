@@ -89,7 +89,32 @@ Alias "/.well-known/acme-challenge" "{{settings.system.letsencryptchallengepath}
 ]]>
 						</content>
 					</file>
-					<command><![CDATA[{{settings.system.apachereload_command}}]]></command>
+					<file name="/etc/apache2/ports.conf">
+						<visibility mode="true">{{settings.system.use_varnish}}
+						</visibility>
+						<content><![CDATA[
+Listen 8080
+
+<IfModule ssl_module>
+        Listen 8443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 8443
+</IfModule>
+]]>
+						</content>
+					</file>
+					<command>
+						<visibility mode="true">{{settings.system.use_varnish}}
+						</visibility>
+						<content><![CDATA[service apache2 restart]]></content>
+					</command>
+					<command>
+						<visibility mode="false">{{settings.system.use_varnish}}
+						</visibility>
+						<content><![CDATA[{{settings.system.apachereload_command}}]]></content>
+					</command>
 				</daemon>
 				<!-- HTTP Lighttpd -->
 				<daemon name="lighttpd" title="LigHTTPd (deprecated)">
@@ -3425,6 +3450,7 @@ aliases:     files
 [Unit]
 Description=Varnish Cache, a high-performance HTTP accelerator
 Documentation=https://www.varnish-cache.org/docs/ man:varnishd
+ConditionPathExists=/etc/varnish/default.vcl
 
 [Service]
 Type=simple
@@ -3534,7 +3560,7 @@ sub vcl_deliver {
 						<visibility mode="true">{{settings.system.use_ssl}}
 						</visibility>
 						<command><![CDATA[touch /etc/hitch/hitch.conf]]></command>
-						<command><![CDATA[useradd -s /bin/false -g hitch varnish]]></command>
+						<command><![CDATA[usermod -a -G varnish _hitch]]></command>
 					</commands>
 					<file name="/etc/hitch/hitch.conf" backup="true">
 						<visibility mode="true">{{settings.system.use_ssl}}
@@ -3551,11 +3577,11 @@ daemon = on
 
 # We strongly recommend you create a separate non-privileged hitch
 # user and group
-user = "hitch"
+user = "_hitch"
 group = "varnish"
 
 # SSL Certificate directory for x509 certificates for SNI
-pem-dir = "/etc/ssl/froxlor-custom/"
+pem-dir = "{{settings.system.customer_ssl_path}}"
 pem-dir-glob = "*_fullchain.pem"
 ciphers = ""
 ciphersuites = ""
@@ -3569,9 +3595,35 @@ write-proxy-v2 = on             # Write PROXY header
 ]]>
 						</content>
 					</file>
+					<file name="/usr/lib/systemd/system/hitch.service" backup="true">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<content><![CDATA[
+[Unit]
+Description=Hitch TLS unwrapping daemon
+After=network.target
+Documentation=https://github.com/varnish/hitch/tree/master/docs man:hitch(8)
+ConditionPathExists=/etc/hitch/hitch.conf
+
+[Service]
+ExecStart=/usr/sbin/hitch --user _hitch --group varnish --config /etc/hitch/hitch.conf --quiet
+ExecReload=/bin/kill -HUP $MAINPID
+Type=simple
+Restart=on-failure
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+]]>
+						</content>
+					</file>
 					<commands index="5">
 						<visibility mode="true">{{settings.system.use_ssl}}
 						</visibility>
+						<command><![CDATA[systemctl daemon-reload]]></command>
 						<command><![CDATA[service hitch restart]]></command>
 					</commands>
 				</daemon>
