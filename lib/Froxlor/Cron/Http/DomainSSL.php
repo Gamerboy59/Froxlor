@@ -94,6 +94,12 @@ class DomainSSL
 				$ssl_files['ssl_key_file'] = '';
 			}
 
+			if (Settings::Get('system.use_varnish') == '1') {
+				// put my.key and fullchain.pem together for varnish.
+				$dom_certs['ssl_fullchain_file'] = trim($dom_certs['ssl_key_file']) . "\n" . trim($dom_certs['ssl_fullchain_file']) . "\n";
+				$ssl_files['ssl_key_file'] = '';
+			}
+
 			// initialize optional files
 			$ssl_files['ssl_ca_file'] = '';
 			$ssl_files['ssl_cert_chainfile'] = '';

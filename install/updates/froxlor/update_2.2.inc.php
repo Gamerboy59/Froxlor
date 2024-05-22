@@ -105,3 +105,12 @@ if (Froxlor::isDatabaseVersion('202312230')) {
 
 	Froxlor::updateToDbVersion('202401090');
 }
+
+if (Froxlor::isDatabaseVersion('202401090')) {
+	
+	Update::showUpdateStep("Adding new settings");
+	Settings::AddNew("system.use_varnish", "0");
+	Update::lastStepStatus(0);
+
+	Froxlor::updateToDbVersion('202405210');
+}
