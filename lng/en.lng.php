@@ -682,6 +682,32 @@ return [
 			'description' => 'Incoming emails will be protected by <a href="https://en.wikipedia.org/wiki/Greylisting_(email)" target="_blank">greylisting</a>.<br/>Default: yes'
 		],
 	],
+	'webcache' => [
+		'activated' => [
+			'title' => 'Activate webcache?',
+			'description' => 'Activate to use the varnish caching service.<br><em class="text-danger">CACHING CANNOT BE CONFIGURED PER DOMAIN!</em>',
+		],
+		'varnish_config_dir' => [
+			'title' => 'Varnish config directory',
+			'description' => 'Path to the varnish config directory',
+		],
+		'varnish_service_file' => [
+			'title' => 'Varnish systemd service file',
+			'description' => 'Path to the systemd service unit file of varnish',
+		],
+		'varnish_reload_command' => [
+			'title' => 'Varnish Restart command',
+			'description' => 'Please specify the restart command for the varnish service.',
+		],
+		'hitch_config_file' => [
+			'title' => 'Hitch config file',
+			'description' => 'Path to the config file of hitch',
+		],
+		'hitch_reload_command' => [
+			'title' => 'Hitch restart command',
+			'description' => 'Please specify the restart command for the hitch service.',
+		]
+	]
 	'dns' => [
 		'destinationip' => 'Domain IP(s)',
 		'standardip' => 'Server standard IP',
@@ -2139,10 +2165,6 @@ Yours sincerely, your administrator',
 			'description' => 'In order to use the froxlor API you need to activate this option. For more detailed information see <a href="https://docs.froxlor.org/latest/api-guide/" target="_new">https://docs.froxlor.org/</a>',
 		],
 		'api_customer_default' => '"Allow API access" default value for new customers',
-		'use_varnish' => [
-			'title' => 'Enable Varnish Cache',
-			'description' => 'This enables caching of all domains.<br><em class="text-danger">CACHING CANNOT BE SET PER DOMAIN!</em>',
-		],
 		'dhparams_file' => [
 			'title' => 'DHParams file (Diffie–Hellman key exchange)',
 			'description' => 'If a dhparams.pem file is specified here it will be included in the webserver configuration. Leave empty to disable.<br>Example: /etc/ssl/webserver/dhparams.pem<br><br>If the file does not exist, it will be created automatically with the following command: <code>openssl dhparam -out /etc/ssl/webserver/dhparams.pem 4096</code>. It is recommended to create the file prior to specifying it here as the creation takes quite a while and blocks the cronjob.',

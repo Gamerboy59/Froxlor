@@ -265,6 +265,7 @@ return [
 		'sslsettings' => 'SSL-Einstellungen',
 		'specialsettings_replacements' => 'Die folgenden Variablen können verwendet werden:<br/><code>{DOMAIN}</code>, <code>{DOCROOT}</code>, <code>{CUSTOMER}</code>, <code>{IP}</code>, <code>{PORT}</code>, <code>{SCHEME}</code>, <code>{FPMSOCKET}</code> (wenn zutreffend)<br/>',
 		'antispam_settings' => 'Antispam-Einstellungen',
+		'webcache_settings' = 'Webcache-Einstellungen',
 		'caneditphpsettings' => 'Kann PHP-bezogene Domaineinstellungen vornehmen?',
 		'allips' => 'Alle IP-Adressen',
 		'awstatssettings' => 'AWstats-Einstellungen',
@@ -633,6 +634,32 @@ return [
 			'description' => 'Eingehende E-Mails mittels <a href="https://de.wikipedia.org/wiki/Greylisting" target="_blank">Greylisting</a> schützen.<br/>Standard: Ja'
 		],
 	],
+	'webcache' => [
+		'activated' => [
+			'title' => 'Webcache aktivieren?',
+			'description' => 'Aktivieren, um varnish als Caching Dienst zu verwenden.<br><em class="text-danger">CACHING KANN NICHT PRO DOMAIN EINGESTELLT WERDEN!</em>',
+		],
+		'varnish_config_dir' => [
+			'title' => 'Varnish Konfigurationspfad',
+			'description' => 'Pfad zum Varnish Konfigurationsordner',
+		],
+		'varnish_service_file' => [
+			'title' => 'Varnish Systemd Service Datei',
+			'description' => 'Pfad zur Systemd Service Unit Datei von Varnish',
+		],
+		'varnish_reload_command' => [
+			'title' => 'Varnish Restart-Befehl',
+			'description' => 'Wie lautet der Befehl zum Neustarten des varnish-Dienstes?',
+		],
+		'hitch_config_file' => [
+			'title' => 'Hitch Konfigurations Datei',
+			'description' => 'Pfad zur Konfigurationsdatei von Hitch',
+		],
+		'hitch_reload_command' => [
+			'title' => 'Hitch Restart-Befehl',
+			'description' => 'Wie lautet der Befehl zum Neustarten des hitch-Dienstes?',
+		]
+	]
 	'dns' => [
 		'destinationip' => 'Domain-IP-Adresse(n)',
 		'standardip' => 'Server-Standard-IP-Adresse',
@@ -2017,10 +2044,6 @@ Vielen Dank, Ihr Administrator',
 			'description' => 'Um die froxlor API nutzen zu können, muss diese Option aktiviert sein. Für detaillierte Informationen siehe <a href="https://docs.froxlor.org/latest/api-guide/" target="_new">https://docs.froxlor.org/</a>',
 		],
 		'api_customer_default' => '"Erlaube API Nutzung" Vorbelegung für neue Kunden',
-		'use_varnish' => [
-			'title' => 'Aktiviere Varnish Cache',
-			'description' => 'Bei Aktivierung wird das Cachen aller Anwendungen aktiviert.<br><em class="text-danger">CACHING KANN NICHT PRO DOMAIN EINGESTELLT WERDEN!</em>',
-		],
 		'dhparams_file' => [
 			'title' => 'DHParams Datei (Diffie–Hellman key exchange)',
 			'description' => 'Wird eine dhparams.pem Datei hier angegeben, wir sie in die Webserver Konfiguration mit eingefügt.<br>Beispiel: /etc/ssl/webserver/dhparams.pem<br><br>Existiert die Datei nicht, wird sie wie folgt erstellt: <code>openssl dhparam -out /etc/ssl/webserver/dhparams.pem 4096</code>. Es wird empfohlen die Datei zu erstellen, bevor sie hier angegeben wird, da die Erstellung längere Zeit in Anspruch nimmt und den Cronjob blockiert.',

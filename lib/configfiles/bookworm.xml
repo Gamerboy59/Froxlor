@@ -89,7 +89,7 @@ Alias "/.well-known/acme-challenge" "{{settings.system.letsencryptchallengepath}
 ]]>
 						</content>
 					</file>
-					<file name="/etc/apache2/ports.conf">
+					<file name="/etc/apache2/ports.conf" backup="true">
 						<visibility mode="true">{{settings.system.use_varnish}}
 						</visibility>
 						<content><![CDATA[
@@ -2688,6 +2688,113 @@ action = "no action";
 					</include>
 				</daemon>
 			</service>
+			<!-- Webcache services -->
+			<service type="webcache" title="Webcache">
+				<!-- varnish -->
+				<daemon name="varnish" title="Varnish">
+					<install><![CDATA[apt-get install varnish]]></install>
+					<file name="/etc/varnish/default.vcl" backup="true">
+						<content><![CDATA[
+# Marker to tell the VCL compiler that this VCL has been written with the
+# 4.0 or 4.1 syntax.
+vcl 4.1;
+
+import proxy;
+
+# Default backend definition. Set this to point to your content server.
+backend default {
+    .host = "localhost";
+    .port = "8080";
+}
+
+sub vcl_recv {
+    # Happens before we check if we have this in cache already.
+    #
+    # Typically you clean up the request here, removing cookies you don't need,
+    # rewriting the request, etc.
+	if(!req.http.X-Forwarded-Proto) {
+        if (proxy.is_ssl()) {
+            set req.http.X-Forwarded-Proto = "https";
+        } else {
+            set req.http.X-Forwarded-Proto = "http";
+        }
+    }
+	if (req.url ~ "^/.well-known/acme-challenge/") {
+       return(pass);
+   }
+}
+
+sub vcl_backend_response {
+    # Happens after we have read the response headers from the backend.
+    #
+    # Here you clean the response headers, removing silly Set-Cookie headers
+    # and other mistakes your backend does.
+}
+
+sub vcl_deliver {
+    # Happens when we have all the pieces we need, and are about to send the
+    # response to the client.
+    #
+    # You can do accounting or modifying the final object here.
+}
+]]>
+						</content>
+					</file>
+					<commands index="1">
+						<command><![CDATA[service varnish restart]]></command>
+					</commands>
+				<install>
+					<visibility mode="true">{{settings.system.use_ssl}}
+					</visibility>
+					<content><![CDATA[apt-get install hitch]]></content>
+				</install>
+					<commands index="2">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<command><![CDATA[touch /etc/hitch/hitch.conf]]></command>
+						<command><![CDATA[usermod -a -G varnish _hitch]]></command>
+					</commands>
+					<file name="/etc/hitch/hitch.conf" backup="true">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<content><![CDATA[
+
+]]>
+						</content>
+					</file>
+					<file name="/usr/lib/systemd/system/hitch.service" backup="true">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<content><![CDATA[
+[Unit]
+Description=Hitch TLS unwrapping daemon
+After=network.target
+Documentation=https://github.com/varnish/hitch/tree/master/docs man:hitch(8)
+ConditionPathExists=/etc/hitch/hitch.conf
+
+[Service]
+ExecStart=/usr/sbin/hitch --config /etc/hitch/hitch.conf --quiet
+ExecReload=/bin/kill -HUP $MAINPID
+Type=simple
+Restart=on-failure
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+]]>
+						</content>
+					</file>
+					<commands index="3">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<command><![CDATA[systemctl daemon-reload]]></command>
+						<command><![CDATA[service hitch restart]]></command>
+					</commands>
+				</daemon>
+			</service>
 			<!-- FTP services -->
 			<service type="ftp" title="{{lng.admin.configfiles.ftp}}">
 				<!-- Proftpd -->
@@ -3437,195 +3544,6 @@ aliases:     files
 ]]>
 						</content>
 					</file>
-				</daemon>
-				<!-- varnish -->
-				<daemon name="varnish"
-					title="varnish">
-					<install><![CDATA[apt-get install varnish]]></install>
-					<commands index="1">
-						<command><![CDATA[touch /etc/systemd/system/varnish.service]]></command>
-					</commands>
-					<file name="/etc/systemd/system/varnish.service" backup="true">
-						<content><![CDATA[
-[Unit]
-Description=Varnish Cache, a high-performance HTTP accelerator
-Documentation=https://www.varnish-cache.org/docs/ man:varnishd
-ConditionPathExists=/etc/varnish/default.vcl
-
-[Service]
-Type=simple
-
-# Maximum number of open files (for ulimit -n)
-LimitNOFILE=131072
-
-# Locked shared memory - should suffice to lock the shared memory log
-# (varnishd -l argument)
-# Default log size is 80MB vsl + 1M vsm + header -> 82MB
-# unit is bytes
-LimitMEMLOCK=85983232
-ExecStart=/usr/sbin/varnishd \
-          -j unix,user=vcache \
-          -F \
-          -a http=:80 \
-          -a uds=/var/run/varnish.sock,PROXY,user=varnish,group=varnish,mode=660 \
-          -T localhost:6082 \
-          -f /etc/varnish/default.vcl \
-          -S /etc/varnish/secret \
-          -r cc_command,vcc_allow_inline_c,vmod_path
-          -p feature=+http2 \
-          -s malloc,1g
-ExecReload=/usr/share/varnish/varnishreload
-ProtectSystem=full
-ProtectHome=true
-PrivateTmp=true
-PrivateDevices=true
-
-[Install]
-WantedBy=multi-user.target
-]]>
-						</content>
-					</file>
-					<commands index="2">
-						<command>
-							<visibility mode="false">{{settings.system.http2_support}}
-							</visibility>
-							<visibility mode="false">{{settings.system.use_ssl}}
-							</visibility>
-							<content><![CDATA[sed -i '/http2/d' /etc/systemd/system/varnish.service]]></content>
-						</command>
-						<command>
-							<visibility mode="false">{{settings.system.use_ssl}}
-							</visibility>
-							<content><![CDATA[sed -i '/PROXY/d' /etc/systemd/system/varnish.service]]></content>
-						</command>
-						<command><![CDATA[systemctl daemon-reload]]></command>
-					</commands>
-					<file name="/etc/varnish/default.vcl" backup="true">
-						<content><![CDATA[
-# Marker to tell the VCL compiler that this VCL has been written with the
-# 4.0 or 4.1 syntax.
-vcl 4.1;
-
-import proxy;
-
-# Default backend definition. Set this to point to your content server.
-backend default {
-    .host = "localhost";
-    .port = "8080";
-}
-
-sub vcl_recv {
-    # Happens before we check if we have this in cache already.
-    #
-    # Typically you clean up the request here, removing cookies you don't need,
-    # rewriting the request, etc.
-	if(!req.http.X-Forwarded-Proto) {
-        if (proxy.is_ssl()) {
-            set req.http.X-Forwarded-Proto = "https";
-        } else {
-            set req.http.X-Forwarded-Proto = "http";
-        }
-    }
-	if (req.url ~ "^/.well-known/acme-challenge/") {
-       return(pass);
-   }
-}
-
-sub vcl_backend_response {
-    # Happens after we have read the response headers from the backend.
-    #
-    # Here you clean the response headers, removing silly Set-Cookie headers
-    # and other mistakes your backend does.
-}
-
-sub vcl_deliver {
-    # Happens when we have all the pieces we need, and are about to send the
-    # response to the client.
-    #
-    # You can do accounting or modifying the final object here.
-}
-
-]]>
-						</content>
-					</file>
-					<commands index="3">
-						<command><![CDATA[service varnish restart]]></command>
-					</commands>
-				<install>
-					<visibility mode="true">{{settings.system.use_ssl}}
-					</visibility>
-					<content><![CDATA[apt-get install hitch]]></content>
-				</install>
-					<commands index="4">
-						<visibility mode="true">{{settings.system.use_ssl}}
-						</visibility>
-						<command><![CDATA[touch /etc/hitch/hitch.conf]]></command>
-						<command><![CDATA[usermod -a -G varnish _hitch]]></command>
-					</commands>
-					<file name="/etc/hitch/hitch.conf" backup="true">
-						<visibility mode="true">{{settings.system.use_ssl}}
-						</visibility>
-						<content><![CDATA[
-frontend = {
-    host = "*"
-    port = "443"
-}
-backend = "/var/run/varnish.sock"    # uds for local connection
-workers = 4                     # number of CPU cores
-
-daemon = on
-
-# We strongly recommend you create a separate non-privileged hitch
-# user and group
-user = "_hitch"
-group = "varnish"
-
-# SSL Certificate directory for x509 certificates for SNI
-pem-dir = "{{settings.system.customer_ssl_path}}"
-pem-dir-glob = "*_fullchain.pem"
-ciphers = ""
-ciphersuites = ""
-
-# Enable to let clients negotiate HTTP/2 with ALPN. (default off)
-alpn-protos = "h2, http/1.1"
-tls-protos = {{settings.system.ssl_protocols}}
-
-# run Varnish as backend over PROXY; varnishd -a :80 -a localhost:6086,PROXY ..
-write-proxy-v2 = on             # Write PROXY header
-]]>
-						</content>
-					</file>
-					<file name="/usr/lib/systemd/system/hitch.service" backup="true">
-						<visibility mode="true">{{settings.system.use_ssl}}
-						</visibility>
-						<content><![CDATA[
-[Unit]
-Description=Hitch TLS unwrapping daemon
-After=network.target
-Documentation=https://github.com/varnish/hitch/tree/master/docs man:hitch(8)
-ConditionPathExists=/etc/hitch/hitch.conf
-
-[Service]
-ExecStart=/usr/sbin/hitch --user _hitch --group varnish --config /etc/hitch/hitch.conf --quiet
-ExecReload=/bin/kill -HUP $MAINPID
-Type=simple
-Restart=on-failure
-PrivateDevices=true
-PrivateTmp=true
-ProtectHome=true
-ProtectSystem=full
-
-[Install]
-WantedBy=multi-user.target
-]]>
-						</content>
-					</file>
-					<commands index="5">
-						<visibility mode="true">{{settings.system.use_ssl}}
-						</visibility>
-						<command><![CDATA[systemctl daemon-reload]]></command>
-						<command><![CDATA[service hitch restart]]></command>
-					</commands>
 				</daemon>
 				<!-- Logrotate -->
 				<daemon name="logrotate" title="Logrotate">

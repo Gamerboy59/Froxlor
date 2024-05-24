@@ -86,19 +86,6 @@ return [
 					],
 					'visible' => Settings::Get('system.use_ssl')
 				],
-				'system_use_varnish' => [
-					'label' => lng('serversettings.use_varnish'),
-					'settinggroup' => 'system',
-					'varname' => 'use_varnish',
-					'type' => 'checkbox',
-					'default' => false,
-					'save_method' => 'storeSettingField',
-					'requires_reconf' => ['http'],
-					'websrv_avail' => [
-						'apache2'
-					],
-					'advanced_mode' => true
-				],
 				'system_dhparams_file' => [
 					'label' => lng('serversettings.dhparams_file'),
 					'settinggroup' => 'system',

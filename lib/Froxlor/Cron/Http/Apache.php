@@ -128,7 +128,7 @@ class Apache extends HttpConfigBase
 
 				$is_redirect = false;
 				// check for SSL redirect
-				if ($row_ipsandports['ssl'] == '0' && Settings::Get('system.le_froxlor_redirect') == '1' && Settings::Get('system.use_varnish') == '0') {
+				if ($row_ipsandports['ssl'] == '0' && Settings::Get('system.le_froxlor_redirect') == '1') {
 					$is_redirect = true;
 					// check whether froxlor uses Let's Encrypt and not cert is being generated yet
 					// or a renewal is ongoing - disable redirect
@@ -371,7 +371,7 @@ class Apache extends HttpConfigBase
 					$this->virtualhosts_data[$vhosts_filename] .= $this->processSpecialConfigTemplate($row_ipsandports['specialsettings'], $domain, $row_ipsandports['ip'], $row_ipsandports['port'], $row_ipsandports['ssl'] == '1') . "\n";
 				}
 
-				if ($row_ipsandports['ssl'] == '1' && Settings::Get('system.use_ssl') == '1' && Settings::Get('system.use_varnish') == '0') {
+				if ($row_ipsandports['ssl'] == '1' && Settings::Get('system.use_ssl') == '1') {
 					if ($row_ipsandports['ssl_specialsettings'] != '') {
 						$this->virtualhosts_data[$vhosts_filename] .= $this->processSpecialConfigTemplate($row_ipsandports['ssl_specialsettings'], $domain, $row_ipsandports['ip'], $row_ipsandports['port'], $row_ipsandports['ssl'] == '1') . "\n";
 					}
@@ -687,7 +687,7 @@ class Apache extends HttpConfigBase
 		$vhost_content .= $this->getServerNames($domain);
 
 		$domain['documentroot_norewrite'] = $domain['documentroot'];
-		if (($ssl_vhost == false && $domain['ssl'] == '1' && $domain['ssl_redirect'] == '1' && Settings::Get('system.use_varnish') == '0')) {
+		if (($ssl_vhost == false && $domain['ssl'] == '1' && $domain['ssl_redirect'] == '1')) {
 			// We must not check if our port differs from port 443,
 			// but if there is a destination-port != 443
 			$_sslport = '';
@@ -713,7 +713,7 @@ class Apache extends HttpConfigBase
 			$domain['documentroot_norewrite'] = 'https://' . $domain['domain'] . $_sslport . '/';
 		}
 
-		if ($ssl_vhost === true && $domain['ssl'] == '1' && Settings::Get('system.use_ssl') == '1' && Settings::Get('system.use_varnish') == '0') {
+		if ($ssl_vhost === true && $domain['ssl'] == '1' && Settings::Get('system.use_ssl') == '1') {
 			if ($domain['ssl_cert_file'] == '' || !file_exists($domain['ssl_cert_file'])) {
 				$domain['ssl_cert_file'] = Settings::Get('system.ssl_cert_file');
 				if (!file_exists($domain['ssl_cert_file'])) {
