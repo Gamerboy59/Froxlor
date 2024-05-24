@@ -1717,7 +1717,7 @@ class Varnish
 
 	}
 
-	protected function createVarnishSystemdService(){
+	public function createVarnishSystemdService(){
 
         FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_INFO, 'webcache::createVarnishSystemdService: creating systemd service file');
         $varnish_systemd_service_file = FileDir::makeCorrectFile(Settings::Get('webcache.varnish_service_file'));
@@ -1799,7 +1799,7 @@ EOD;
 		FileDir::safe_exec(escapeshellcmd(Settings::Get('webcache.varnish_restart_command')));
     }
 
-	protected function createVarnishConfig(){
+	public function createVarnishConfig(){
 
 		// TODO: Process redirects
 
@@ -1867,7 +1867,7 @@ EOD;
 
 	}
 
-	protected function createHitchConfig(){
+	public function createHitchConfig(){
 
         FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_INFO, 'webcache::createHitchConfig: creating config file');
         $hitch_config_file = FileDir::makeCorrectFile(Settings::Get('webcache.hitch_config_file'));
