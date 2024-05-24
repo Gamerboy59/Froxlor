@@ -1721,7 +1721,7 @@ class Varnish
 
         FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_INFO, 'webcache::createVarnishSystemdService: creating systemd service file');
         $varnish_systemd_service_file = FileDir::makeCorrectFile(Settings::Get('webcache.varnish_service_file'));
-		$varnish_systemd_service_dir = FileDir::makeCorrectDir(Settings::Get('webcache.varnish_service_file'));
+		$varnish_systemd_service_dir = FileDir::makeCorrectDir(dirname(Settings::Get('webcache.varnish_service_file')));
 
         // start of varnish systemd service config
         $varnish_systemd_service_data = <<<EOD
@@ -1806,7 +1806,7 @@ EOD;
 		FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_INFO, 'webcache::createVarnishConfig: creating config file');
 
 		$varnish_config_file = FileDir::makeCorrectFile(Settings::Get('webcache.varnish_config_file'));
-		$varnish_config_dir = FileDir::makeCorrectDir(Settings::Get('webcache.varnish_config_file'));
+		$varnish_config_dir = FileDir::makeCorrectDir(dirname(Settings::Get('webcache.varnish_config_file')));
 
         $varnish_config_data = <<<EOD
 # Marker to tell the VCL compiler that this VCL has been written with the
@@ -1871,7 +1871,7 @@ EOD;
 
         FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_INFO, 'webcache::createHitchConfig: creating config file');
         $hitch_config_file = FileDir::makeCorrectFile(Settings::Get('webcache.hitch_config_file'));
-		$hitch_config_dir = FileDir::makeCorrectDir(Settings::Get('webcache.hitch_config_file'));
+		$hitch_config_dir = FileDir::makeCorrectDir(dirname(Settings::Get('webcache.hitch_config_file')));
 
         $cpuCoreCount = is_file('/proc/cpuinfo') ? (preg_match_all('/^processor/m', file_get_contents('/proc/cpuinfo')) > 0 ? round(preg_match_all('/^processor/m', file_get_contents('/proc/cpuinfo')))*0.5 : '4') : '4';
 
