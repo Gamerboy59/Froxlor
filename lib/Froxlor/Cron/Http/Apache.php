@@ -69,7 +69,7 @@ class Apache extends HttpConfigBase
 
 		if(Settings::Get('webcache.activated')){
 
-			$varnish = (new Varnish)->createLocalVhostVarnish();
+			$this->virtualhosts_data = (new Varnish)->createLocalVhostVarnish();
 			$varnishSystemdService = (new Varnish)->createVarnishSystemdService();
 			$varnishConfig = (new Varnish)->createVarnishConfig();
 			$hitchConfig = (new Varnish)->createHitchConfig();
@@ -1679,6 +1679,8 @@ class Varnish
 			$this->virtualhosts_data[$vhosts_filename] .= '</VirtualHost>' . "\n";
 		}
 		FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_DEBUG, $ipport . ' :: inserted vhostcontainer');
+
+		return $this->virtualhosts_data;
 
 		unset($vhosts_filename);
 
