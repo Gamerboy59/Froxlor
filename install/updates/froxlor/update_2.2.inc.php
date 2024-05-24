@@ -109,7 +109,8 @@ if (Froxlor::isDatabaseVersion('202312230')) {
 if (Froxlor::isDatabaseVersion('202401090')) {
 	
 	Update::showUpdateStep("Adding new webcache settings");
-	Settings::AddNew("webcache.activated", "0");
+	$webcache_activated = $_POST['webcache_activated'] ?? 0;
+	Settings::AddNew("webcache.activated", $webcache_activated);
 	Settings::AddNew("webcache.varnish_config_dir", "/etc/varnish/");
 	Settings::AddNew("webcache.varnish_service_file", "/etc/systemd/system/varnish.service");
 	Settings::AddNew("webcache.varnish_reload_command", "service varnish restart");
