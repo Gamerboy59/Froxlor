@@ -1753,7 +1753,7 @@ ExecStart=/usr/sbin/varnishd \
 EOD;
 
         if(Settings::Get('system.http2_support') == '1'){
-           $varnish_systemd_service_data .= '          -p feature=+http2' . "\n";
+           $varnish_systemd_service_data .= "\n". '          -p feature=+http2';
         }
 
         $result_ipsandports_stmt = Database::query("SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` ORDER BY `ip` ASC, `port` ASC");
