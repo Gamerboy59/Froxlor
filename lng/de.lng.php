@@ -265,7 +265,7 @@ return [
 		'sslsettings' => 'SSL-Einstellungen',
 		'specialsettings_replacements' => 'Die folgenden Variablen können verwendet werden:<br/><code>{DOMAIN}</code>, <code>{DOCROOT}</code>, <code>{CUSTOMER}</code>, <code>{IP}</code>, <code>{PORT}</code>, <code>{SCHEME}</code>, <code>{FPMSOCKET}</code> (wenn zutreffend)<br/>',
 		'antispam_settings' => 'Antispam-Einstellungen',
-		'webcache_settings' = 'Webcache-Einstellungen',
+		'webcache_settings' => 'Webcache-Einstellungen',
 		'caneditphpsettings' => 'Kann PHP-bezogene Domaineinstellungen vornehmen?',
 		'allips' => 'Alle IP-Adressen',
 		'awstatssettings' => 'AWstats-Einstellungen',

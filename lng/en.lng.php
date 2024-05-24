@@ -269,7 +269,7 @@ return [
 		'sslsettings' => 'SSL settings',
 		'specialsettings_replacements' => 'You can use the following variables:<br/><code>{DOMAIN}</code>, <code>{DOCROOT}</code>, <code>{CUSTOMER}</code>, <code>{IP}</code>, <code>{PORT}</code>, <code>{SCHEME}</code>, <code>{FPMSOCKET}</code> (if applicable)<br/>',
 		'antispam_settings' => 'Antispam settings',
-		'webcache_settings' = 'Webcache settings',
+		'webcache_settings' => 'Webcache settings',
 		'caneditphpsettings' => 'Can change php-related domain settings?',
 		'allips' => 'All IP\'s',
 		'awstatssettings' => 'AWstats settings',
