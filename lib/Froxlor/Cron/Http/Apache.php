@@ -1483,7 +1483,7 @@ class Varnish
 
 		$this->virtualhosts_data[$vhosts_filename] .= '<VirtualHost ' . $ipport . '>' . "\n";
 
-		$mypath = $this->getMyPath(["docroot" => ""]);
+		$mypath = (new Apache)->getMyPath(["docroot" => ""]);
 
 		$this->virtualhosts_data[$vhosts_filename] .= 'DocumentRoot "' . rtrim($mypath, "/") . '"' . "\n";
 
