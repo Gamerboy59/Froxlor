@@ -90,7 +90,7 @@ Alias "/.well-known/acme-challenge" "{{settings.system.letsencryptchallengepath}
 						</content>
 					</file>
 					<file name="/etc/apache2/ports.conf" backup="true">
-						<visibility mode="true">{{settings.system.use_varnish}}
+						<visibility mode="true">{{settings.webcache.activated}}
 						</visibility>
 						<content><![CDATA[
 Listen 8080
@@ -106,12 +106,7 @@ Listen 8080
 						</content>
 					</file>
 					<command>
-						<visibility mode="true">{{settings.system.use_varnish}}
-						</visibility>
-						<content><![CDATA[service apache2 restart]]></content>
-					</command>
-					<command>
-						<visibility mode="false">{{settings.system.use_varnish}}
+						<visibility mode="false">{{settings.webcache.activated}}
 						</visibility>
 						<content><![CDATA[{{settings.system.apachereload_command}}]]></content>
 					</command>
@@ -2754,14 +2749,6 @@ sub vcl_deliver {
 						<command><![CDATA[touch /etc/hitch/hitch.conf]]></command>
 						<command><![CDATA[usermod -a -G varnish _hitch]]></command>
 					</commands>
-					<file name="/etc/hitch/hitch.conf" backup="true">
-						<visibility mode="true">{{settings.system.use_ssl}}
-						</visibility>
-						<content><![CDATA[
-
-]]>
-						</content>
-					</file>
 					<file name="/usr/lib/systemd/system/hitch.service" backup="true">
 						<visibility mode="true">{{settings.system.use_ssl}}
 						</visibility>

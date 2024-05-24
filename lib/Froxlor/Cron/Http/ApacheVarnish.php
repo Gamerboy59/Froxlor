@@ -33,7 +33,6 @@ use Froxlor\Http\Directory;
 use Froxlor\Settings;
 
 /**
- * @author        Florian Lippert <flo@syscp.org> (2003-2009)
  * @author        Froxlor team <team@froxlor.org> (2010-)
  */
 class ApacheVarnish extends Apache
