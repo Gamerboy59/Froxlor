@@ -1483,7 +1483,11 @@ class Varnish
 
 		$this->virtualhosts_data[$vhosts_filename] .= '<VirtualHost ' . $ipport . '>' . "\n";
 
-		$mypath = (new Apache)->getMyPath(["docroot" => ""]);
+		if (Settings::Get('system.froxlordirectlyviahostname')) {
+			$mypath = FileDir::makeCorrectDir(Froxlor::getInstallDir());
+		} else {
+			$mypath = FileDir::makeCorrectDir(dirname(Froxlor::getInstallDir()));
+		}
 
 		$this->virtualhosts_data[$vhosts_filename] .= 'DocumentRoot "' . rtrim($mypath, "/") . '"' . "\n";
 
