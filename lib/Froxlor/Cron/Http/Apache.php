@@ -559,7 +559,7 @@ class Apache extends HttpConfigBase
 		$this->virtualhosts_data[$vhosts_filename] .= '  </Directory>' . "\n";
 
 		$ocsp_cache_filename = $this->getCustomVhostFilename('03_froxlor_ocsp_cache.conf');
-		if (Settings::Get('system.use_ssl') == '1' && Settings::Get('system.apache24') == 1) {
+		if (Settings::Get('system.use_ssl') == '1' && Settings::Get('system.apache24') == 1 && Settings::Get('webcache.activated') == 0) {
 			$this->virtualhosts_data[$ocsp_cache_filename] = 'SSLStaplingCache ' . Settings::Get('system.apache24_ocsp_cache_path') . "\n";
 		} else {
 			if (file_exists($ocsp_cache_filename)) {
