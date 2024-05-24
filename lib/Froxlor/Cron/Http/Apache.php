@@ -1893,7 +1893,7 @@ WHERE `ips`.`ssl` = 1;");
 
 		// Group by ip and port
 		$configs = [];
-		while ($row = $result_ipsandports_domain_stmt->fetch(PDO::FETCH_ASSOC)) {
+		while ($row = $result_ipsandports_domains_stmt->fetch(PDO::FETCH_ASSOC)) {
 			$key = $row['ip'] . ':' . $row['port'];
 			$configs[$key][] = $row['domain'];
 		}
