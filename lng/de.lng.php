@@ -667,7 +667,7 @@ return [
 			'title' => 'Hitch Restart-Befehl',
 			'description' => 'Wie lautet der Befehl zum Neustarten des hitch-Dienstes?',
 		]
-	]
+	],
 	'dns' => [
 		'destinationip' => 'Domain-IP-Adresse(n)',
 		'standardip' => 'Server-Standard-IP-Adresse',

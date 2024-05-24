@@ -716,7 +716,7 @@ return [
 			'title' => 'Hitch restart command',
 			'description' => 'Please specify the restart command for the hitch service.',
 		]
-	]
+	],
 	'dns' => [
 		'destinationip' => 'Domain IP(s)',
 		'standardip' => 'Server standard IP',
