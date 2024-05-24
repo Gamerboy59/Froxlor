@@ -89,6 +89,22 @@ Alias "/.well-known/acme-challenge" "{{settings.system.letsencryptchallengepath}
 ]]>
 						</content>
 					</file>
+					<file name="/etc/apache2/ports.conf" backup="true">
+						<visibility mode="true">{{settings.webcache.activated}}
+						</visibility>
+						<content><![CDATA[
+Listen 8080
+
+<IfModule ssl_module>
+        Listen 8443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 8443
+</IfModule>
+]]>
+						</content>
+					</file>
 					<command><![CDATA[{{settings.system.apachereload_command}}]]></command>
 				</daemon>
 				<!-- HTTP Lighttpd -->
@@ -2661,6 +2677,58 @@ action = "no action";
 					</include>
 					<include>//service[@type='antispam']/general/commands[@index=3]
 					</include>
+				</daemon>
+			</service>
+			<!-- Webcache services -->
+			<service type="webcache" title="Webcache">
+				<!-- varnish -->
+				<daemon name="varnish" title="Varnish">
+					<install><![CDATA[apt-get install varnish]]></install>
+					<commands index="1">
+						<command><![CDATA[touch /etc/varnish/default.vcl]]></command>
+					</commands>
+				<install>
+					<visibility mode="true">{{settings.system.use_ssl}}
+					</visibility>
+					<content><![CDATA[apt-get install hitch]]></content>
+				</install>
+					<commands index="2">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<command><![CDATA[touch /etc/hitch/hitch.conf]]></command>
+						<command><![CDATA[usermod -a -G varnish _hitch]]></command>
+					</commands>
+					<file name="/usr/lib/systemd/system/hitch.service" backup="true">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<content><![CDATA[
+[Unit]
+Description=Hitch TLS unwrapping daemon
+After=network.target
+Documentation=https://github.com/varnish/hitch/tree/master/docs man:hitch(8)
+ConditionPathExists=/etc/hitch/hitch.conf
+
+[Service]
+ExecStart=/usr/sbin/hitch --config /etc/hitch/hitch.conf --quiet
+ExecReload=/bin/kill -HUP $MAINPID
+Type=simple
+Restart=on-failure
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
+]]>
+						</content>
+					</file>
+					<commands index="3">
+						<visibility mode="true">{{settings.system.use_ssl}}
+						</visibility>
+						<command><![CDATA[systemctl daemon-reload]]></command>
+						<command><![CDATA[service hitch restart]]></command>
+					</commands>
 				</daemon>
 			</service>
 			<!-- FTP services -->

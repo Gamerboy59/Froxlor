@@ -265,6 +265,7 @@ return [
 		'sslsettings' => 'SSL-Einstellungen',
 		'specialsettings_replacements' => 'Die folgenden Variablen können verwendet werden:<br/><code>{DOMAIN}</code>, <code>{DOCROOT}</code>, <code>{CUSTOMER}</code>, <code>{IP}</code>, <code>{PORT}</code>, <code>{SCHEME}</code>, <code>{FPMSOCKET}</code> (wenn zutreffend)<br/>',
 		'antispam_settings' => 'Antispam-Einstellungen',
+		'webcache_settings' = 'Webcache-Einstellungen',
 		'caneditphpsettings' => 'Kann PHP-bezogene Domaineinstellungen vornehmen?',
 		'allips' => 'Alle IP-Adressen',
 		'awstatssettings' => 'AWstats-Einstellungen',
@@ -633,6 +634,40 @@ return [
 			'description' => 'Eingehende E-Mails mittels <a href="https://de.wikipedia.org/wiki/Greylisting" target="_blank">Greylisting</a> schützen.<br/>Standard: Ja'
 		],
 	],
+	'webcache' => [
+		'activated' => [
+			'title' => 'Webcache aktivieren?',
+			'description' => 'Aktivieren, um varnish als Caching Dienst zu verwenden.<br><em class="text-danger">CACHING KANN NICHT PRO DOMAIN EINGESTELLT WERDEN!</em>',
+		],
+		'varnish_config_dir' => [
+			'title' => 'Varnish Konfigurationspfad',
+			'description' => 'Pfad zum Varnish Konfigurationsordner',
+		],
+		'varnish_service_file' => [
+			'title' => 'Varnish Systemd Service Datei',
+			'description' => 'Pfad zur Systemd Service Unit Datei von Varnish',
+		],
+		'varnish_config_file' => [
+			'title' => 'Varnish Konfigurations Datei',
+			'description' => 'Pfad zur Konfigurationsdatei von Varnish',
+		],
+		'varnish_reload_command' => [
+			'title' => 'Varnish Reload-Befehl',
+			'description' => 'Wie lautet der Befehl zum Neuladen der Konfiguration des varnish-Dienstes?',
+		],
+		'varnish_restart_command' => [
+			'title' => 'Varnish Restart-Befehl',
+			'description' => 'Wie lautet der Befehl zum Neustarten des varnish-Dienstes?',
+		],
+		'hitch_config_file' => [
+			'title' => 'Hitch Konfigurations Datei',
+			'description' => 'Pfad zur Konfigurationsdatei von Hitch',
+		],
+		'hitch_reload_command' => [
+			'title' => 'Hitch Restart-Befehl',
+			'description' => 'Wie lautet der Befehl zum Neustarten des hitch-Dienstes?',
+		]
+	]
 	'dns' => [
 		'destinationip' => 'Domain-IP-Adresse(n)',
 		'standardip' => 'Server-Standard-IP-Adresse',

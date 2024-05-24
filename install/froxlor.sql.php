@@ -390,6 +390,14 @@ INSERT INTO `panel_settings` (`settinggroup`, `varname`, `value`) VALUES
 	('antispam', 'config_file', '/etc/rspamd/local.d/froxlor_settings.conf'),
 	('antispam', 'reload_command', 'service rspamd restart'),
 	('antispam', 'dkim_keylength', '1024'),
+  ('webcache', 'activated', '0'),
+	('webcache', 'varnish_config_dir', '/etc/varnish/'),
+	('webcache', 'varnish_service_file', '/etc/systemd/system/varnish.service'),
+  ('webcache', 'varnish_config_file', '/etc/varnish/default.vcl'),
+	('webcache', 'varnish_reload_command', 'service varnish reload'),
+  ('webcache', 'varnish_restart_command', 'service varnish restart'),
+	('webcache', 'hitch_config_file', '/etc/hitch/hitch.conf'),
+	('webcache', 'hitch_reload_command', 'service hitch restart'),
 	('admin', 'show_news_feed', '0'),
 	('admin', 'show_version_login', '0'),
 	('admin', 'show_version_footer', '0'),
@@ -731,7 +739,7 @@ opcache.validate_timestamps'),
 	('panel', 'settings_mode', '0'),
 	('panel', 'menu_collapsed', '1'),
 	('panel', 'version', '2.2.0-dev1'),
-	('panel', 'db_version', '202401090');
+	('panel', 'db_version', '202405210');
 
 
 DROP TABLE IF EXISTS `panel_tasks`;

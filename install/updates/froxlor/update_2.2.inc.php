@@ -105,3 +105,20 @@ if (Froxlor::isDatabaseVersion('202312230')) {
 
 	Froxlor::updateToDbVersion('202401090');
 }
+
+if (Froxlor::isDatabaseVersion('202401090')) {
+	
+	Update::showUpdateStep("Adding new webcache settings");
+	$webcache_activated = $_POST['webcache_activated'] ?? 0;
+	Settings::AddNew("webcache.activated", $webcache_activated);
+	Settings::AddNew("webcache.varnish_config_dir", "/etc/varnish/");
+	Settings::AddNew("webcache.varnish_service_file", "/etc/systemd/system/varnish.service");
+	Settings::AddNew("webcache.varnish_config_file", "/etc/varnish/default.vcl");
+	Settings::AddNew("webcache.varnish_reload_command", "service varnish reload");
+	Settings::AddNew("webcache.varnish_restart_command", "service varnish restart");
+	Settings::AddNew("webcache.hitch_config_file", "/etc/hitch/hitch.conf");
+	Settings::AddNew("webcache.hitch_reload_command", "service hitch restart");
+	Update::lastStepStatus(0);
+
+	Froxlor::updateToDbVersion('202405210');
+}

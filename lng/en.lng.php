@@ -269,6 +269,7 @@ return [
 		'sslsettings' => 'SSL settings',
 		'specialsettings_replacements' => 'You can use the following variables:<br/><code>{DOMAIN}</code>, <code>{DOCROOT}</code>, <code>{CUSTOMER}</code>, <code>{IP}</code>, <code>{PORT}</code>, <code>{SCHEME}</code>, <code>{FPMSOCKET}</code> (if applicable)<br/>',
 		'antispam_settings' => 'Antispam settings',
+		'webcache_settings' = 'Webcache settings',
 		'caneditphpsettings' => 'Can change php-related domain settings?',
 		'allips' => 'All IP\'s',
 		'awstatssettings' => 'AWstats settings',
@@ -682,6 +683,40 @@ return [
 			'description' => 'Incoming emails will be protected by <a href="https://en.wikipedia.org/wiki/Greylisting_(email)" target="_blank">greylisting</a>.<br/>Default: yes'
 		],
 	],
+	'webcache' => [
+		'activated' => [
+			'title' => 'Activate webcache?',
+			'description' => 'Activate to use the varnish caching service.<br><em class="text-danger">CACHING CANNOT BE CONFIGURED PER DOMAIN!</em>',
+		],
+		'varnish_config_dir' => [
+			'title' => 'Varnish config directory',
+			'description' => 'Path to the varnish config directory',
+		],
+		'varnish_service_file' => [
+			'title' => 'Varnish systemd service file',
+			'description' => 'Path to the systemd service unit file of varnish',
+		],
+		'varnish_config_file' => [
+			'title' => 'Varnish config file',
+			'description' => 'Path to the config file of varnish',
+		],
+		'varnish_reload_command' => [
+			'title' => 'Varnish reload command',
+			'description' => 'Please specify the reload command for the varnish service.',
+		],
+		'varnish_restart_command' => [
+			'title' => 'Varnish restart command',
+			'description' => 'Please specify the restart command for the varnish service.',
+		],
+		'hitch_config_file' => [
+			'title' => 'Hitch config file',
+			'description' => 'Path to the config file of hitch',
+		],
+		'hitch_reload_command' => [
+			'title' => 'Hitch restart command',
+			'description' => 'Please specify the restart command for the hitch service.',
+		]
+	]
 	'dns' => [
 		'destinationip' => 'Domain IP(s)',
 		'standardip' => 'Server standard IP',

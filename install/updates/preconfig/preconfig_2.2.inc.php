@@ -43,6 +43,18 @@ if (Update::versionInUpdate($current_version, '2.2.0-dev1')) {
 		'prior_infotext' => $description
 	];
 }
+if (Update::versionInUpdate($current_db_version, '202405210')) {
+    $has_preconfig = true;
+    $description = 'roxlor now features webcaching configurations using varnish. Would you like to enable the wecache feature (required re-configuration of services)?';
+    $question = '<strong>Enable webcache via varnish (default: no)</strong>&nbsp;';
+    $return['webcache_activated'] = [
+        'type' => 'checkbox',
+        'value' => 1,
+        'checked' => 0,
+        'label' => $question,
+        'prior_infotext' => $description
+    ];
+}
 
 $preconfig['fields'] = $return;
 return $preconfig;
