@@ -72,7 +72,9 @@ class Apache extends HttpConfigBase
 			$this->virtualhosts_data = (new Varnish)->createLocalVhostVarnish();
 			$varnishSystemdService = (new Varnish)->createVarnishSystemdService();
 			$varnishConfig = (new Varnish)->createVarnishConfig();
-			$hitchConfig = (new Varnish)->createHitchConfig();
+			if (Settings::Get('system.use_ssl')){
+				$hitchConfig = (new Varnish)->createHitchConfig();
+			}
 
 		} else {
 
@@ -1459,7 +1461,7 @@ class Apache extends HttpConfigBase
 	}
 }
 
-class Varnish
+class Varnish extends HttpConfigBase
 {
 
 	public function createLocalVhostVarnish(){
@@ -1483,11 +1485,7 @@ class Varnish
 
 		$this->virtualhosts_data[$vhosts_filename] .= '<VirtualHost ' . $ipport . '>' . "\n";
 
-		if (Settings::Get('system.froxlordirectlyviahostname')) {
-			$mypath = FileDir::makeCorrectDir(Froxlor::getInstallDir());
-		} else {
-			$mypath = FileDir::makeCorrectDir(dirname(Froxlor::getInstallDir()));
-		}
+		$mypath = $this->getMyPath(["docroot" => ""]);
 
 		$this->virtualhosts_data[$vhosts_filename] .= 'DocumentRoot "' . rtrim($mypath, "/") . '"' . "\n";
 
@@ -1891,13 +1889,59 @@ EOD;
 		$result_ipsandports_domains_stmt = Database::query("SELECT `ips`.`ip` AS `ip`, `ips`.`port` AS `port`, `dom`.`domain` AS `domain`
 FROM `panel_ipsandports` `ips`
 JOIN `panel_domaintoip` `d2ip` ON `ips`.`id` = `d2ip`.`id_ipandports` JOIN `panel_domains` `dom` ON `d2ip`.`id_domain` = `dom`.`id`
-WHERE `ips`.`ssl` = 1;");
+WHERE `ips`.`ssl` = 1");
 
 		// Group by ip and port
 		$configs = [];
 		while ($row = $result_ipsandports_domains_stmt->fetch(PDO::FETCH_ASSOC)) {
 			$key = $row['ip'] . ':' . $row['port'];
 			$configs[$key][] = $row['domain'];
+		}
+
+		// add froxlor hostname to always generated values
+		if (Settings::Get('system.le_froxlor_enabled') && ($this->froxlorVhostHasLetsEncryptCert() == false || $this->froxlorVhostLetsEncryptNeedsRenew())) {
+			Cronjob::inserttask(TaskId::REBUILD_VHOST);
+		} else {
+			$result_ipsandports_stmt = Database::query("SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` WHERE `ssl` = 1 ORDER BY `ip` ASC, `port` ASC");
+
+			while ($row_ipsandports = $result_ipsandports_stmt->fetch(PDO::FETCH_ASSOC)) {
+				// check for required fallback
+				if (($row_ipsandports['ssl_cert_file'] == '' || !file_exists($row_ipsandports['ssl_cert_file'])) && (Settings::Get('system.le_froxlor_enabled') == '0' || $this->froxlorVhostHasLetsEncryptCert() == false)) {
+					$row_ipsandports['ssl_cert_file'] = Settings::Get('system.ssl_cert_file');
+					if (!file_exists($row_ipsandports['ssl_cert_file'])) {
+						FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_DEBUG, 'System certificate file "' . Settings::Get('system.ssl_cert_file') . '" does not seem to exist. Creating self-signed certificate...');
+						Crypt::createSelfSignedCertificate();
+					}
+				}
+
+				if ($row_ipsandports['ssl_key_file'] == '') {
+					$row_ipsandports['ssl_key_file'] = Settings::Get('system.ssl_key_file');
+					if (!file_exists($row_ipsandports['ssl_key_file'])) {
+						// explicitly disable ssl for this vhost
+						$row_ipsandports['ssl_cert_file'] = "";
+						FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_DEBUG, 'System certificate key-file "' . Settings::Get('system.ssl_key_file') . '" does not seem to exist. Disabling SSL-vhost for "' . Settings::Get('system.hostname') . '"');
+					} else {
+						$systemHostname = Settings::Get('system.hostname');
+						$systemCertFile = Settings::Get('system.ssl_cert_file');
+						$systemKeyFile = Settings::Get('system.ssl_key_file');
+						foreach ($configs as $key => &$domains) {
+							$domains[] = ['domain' => $systemHostname, 'cert' => $systemCertFile, 'key' => $systemKeyFile];
+						}
+					}
+				}
+			}
+		}
+
+		$froxlor_aliases = Settings::Get('system.froxloraliases');
+		if (!empty($froxlor_aliases)) {
+			$froxlor_aliases = explode(",", $froxlor_aliases);
+			foreach ($froxlor_aliases as $falias) {
+				if (Validate::validateDomain(trim($falias))) {
+					foreach ($configs as $key => &$domains) {
+						$domains[] = $falias;
+					}
+				}
+			}
 		}
 
 		// create domain certificate configs for each ip and port assigned to a domain
@@ -1908,8 +1952,14 @@ WHERE `ips`.`ssl` = 1;");
 			$hitch_config_data .= "    host = \"$ip\"\n";
 			$hitch_config_data .= "    port = \"$port\"\n";
 			foreach ($domains as $domain) {
-				$cert_file = $domain . '.crt';
-				$key_file = $domain . '.key';
+				if (is_array($domain)) {
+					$domain = $domain['domain'];
+					$cert_file = $domain['cert'];
+					$key_file = $domain['key'];
+				} else {
+					$cert_file = $domain . '.crt';
+					$key_file = $domain . '.key';
+				}
 				$hitch_config_data .= "    pem-file = {\n";
 				$hitch_config_data .= "        cert = \"$cert_file\"\n";
 				$hitch_config_data .= "        private-key = \"$key_file\"\n";
