@@ -1906,6 +1906,16 @@ WHERE `ips`.`ssl` = 1");
 
 			while ($row_ipsandports = $result_ipsandports_stmt->fetch(PDO::FETCH_ASSOC)) {
 
+				$domain = [
+					'id' => 0,
+					'domain' => Settings::Get('system.hostname'),
+					'adminid' => 1, /* first admin-user (superadmin) */
+					'loginname' => 'froxlor.panel',
+					'parentdomainid' => 0,
+					'ssl_key_file' => $row_ipsandports['ssl_key_file'],
+					'ssl_cert_file' => $row_ipsandports['ssl_cert_file']
+				];
+
 				// SSL STUFF
 				$dssl = new DomainSSL();
 				// this sets the ssl-related array-indices in the $domain array
