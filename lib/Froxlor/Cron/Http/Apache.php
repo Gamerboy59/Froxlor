@@ -1905,6 +1905,13 @@ WHERE `ips`.`ssl` = 1");
 			$result_ipsandports_stmt = Database::query("SELECT * FROM `" . TABLE_PANEL_IPSANDPORTS . "` WHERE `ssl` = 1 ORDER BY `ip` ASC, `port` ASC");
 
 			while ($row_ipsandports = $result_ipsandports_stmt->fetch(PDO::FETCH_ASSOC)) {
+
+				// SSL STUFF
+				$dssl = new DomainSSL();
+				// this sets the ssl-related array-indices in the $domain array
+				// if the domain has customer-defined ssl-certificates
+				$dssl->setDomainSSLFilesArray($domain);
+
 				// check for required fallback
 				if (($row_ipsandports['ssl_cert_file'] == '' || !file_exists($row_ipsandports['ssl_cert_file'])) && (Settings::Get('system.le_froxlor_enabled') == '0' || $this->froxlorVhostHasLetsEncryptCert() == false)) {
 					$row_ipsandports['ssl_cert_file'] = Settings::Get('system.ssl_cert_file');
@@ -1919,16 +1926,17 @@ WHERE `ips`.`ssl` = 1");
 					if (!file_exists($row_ipsandports['ssl_key_file'])) {
 						// explicitly disable ssl for this vhost
 						$row_ipsandports['ssl_cert_file'] = "";
-						FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_DEBUG, 'System certificate key-file "' . Settings::Get('system.ssl_key_file') . '" does not seem to exist. Disabling SSL-vhost for "' . Settings::Get('system.hostname') . '"');
-					} else {
-						$systemHostname = Settings::Get('system.hostname');
-						$systemCertFile = Settings::Get('system.ssl_cert_file');
-						$systemKeyFile = Settings::Get('system.ssl_key_file');
-						foreach ($configs as $key => &$domains) {
-							$domains[] = ['domain' => $systemHostname, 'cert' => $systemCertFile, 'key' => $systemKeyFile];
-						}
+						FroxlorLogger::getInstanceOf()->logAction(FroxlorLogger::CRON_ACTION, LOG_DEBUG, 'System certificate key-file "' . Settings::Get('system.ssl_key_file') . '" does not seem to exist. Disabling SSL-hitch-config for "' . Settings::Get('system.hostname') . '"');
 					}
 				}
+
+				if (file_exists($row_ipsandports['ssl_key_file']) && file_exists($row_ipsandports['ssl_cert_file'])) {
+					$systemHostname = Settings::Get('system.hostname');
+					foreach ($configs as $key => &$domains) {
+						$domains[] = ['domain' => $systemHostname, 'key' => $row_ipsandports['ssl_key_file'], 'cert' => $row_ipsandports['ssl_cert_file']];
+					}
+				}
+
 			}
 		}
 
